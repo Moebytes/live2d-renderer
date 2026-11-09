@@ -197,7 +197,7 @@ model.inputAudio(audioArrayBuffer)
 ```ts
 model.on("hit", (hitAreas: string[], x: number, y: number) => {
   console.log("Hit!")
-})s
+})
 ```
 
 ### Licenses
