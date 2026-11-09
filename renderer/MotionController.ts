@@ -24,12 +24,12 @@ export class MotionController {
                 const motion = this.model.loadMotion(motionBuffer, motionBuffer.byteLength, 
                 name, null, null, this.model.settings, group, i)
 
-                if (motion !== null) {
+                if (motion) {
                     motion.setEffectIds(this.model.eyeBlinkIds, this.model.lipSyncIds)
-                    if (this.model.motions.getValue(name) !== null) {
-                        ACubismMotion.delete(this.model.motions.getValue(name))
+                    if (this.model.motions.has(name)) {
+                        ACubismMotion.delete(this.model.motions.get(name))
                     }
-                    this.model.motions.setValue(name, motion)
+                    this.model.motions.set(name, motion)
                 } else {
                     this.model.totalMotionCount--
                 }
@@ -74,10 +74,10 @@ export class MotionController {
         const {motionBuffers, wavBuffer} = motionGroup.motionData
 
         const name = `${group}_${i}`
-        let motion = this.model.motions.getValue(name) as CubismMotion
+        let motion = this.model.motions.get(name) as CubismMotion
         let autoDelete = false
 
-        if (motion === null) {
+        if (!motion) {
             const motionBuffer = motionBuffers[i]
 
             motion = this.model.loadMotion(motionBuffer, motionBuffer.byteLength, null, onEndMotion, 

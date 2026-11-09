@@ -80,7 +80,7 @@ export class TouchController {
         for (let i = 0; i < this.model.settings.getHitAreasCount(); i++) {
             const drawId = this.model.settings.getHitAreaId(i)
             if (this.model.isHit(drawId, x, y)) {
-                hitAreas.push(drawId.getString().s)
+                hitAreas.push(drawId.getString())
             }
         }
         this.model.emit("hit", hitAreas, x, y)

@@ -10,8 +10,6 @@ import {CubismFramework} from "../framework/src/live2dcubismframework"
 import {CubismViewMatrix} from "../framework/src/math/cubismviewmatrix"
 import {CubismMatrix44} from "../framework/src/math/cubismmatrix44"
 import {CubismMoc} from "../framework/src/model/cubismmoc"
-import {csmVector} from "../framework/src/type/csmvector"
-import {csmMap} from "../framework/src/type/csmmap"
 import {Live2DCubismUserModel} from "./Live2DCubismUserModel"
 import {WavFileController} from "./WavFileController"
 import {TouchController} from "./TouchController"
@@ -118,13 +116,13 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
     private events: {[event: string]: Function[]} = {}
     private _paused: boolean
     public buffers: Live2DBuffers
-    public motions: csmMap<string, ACubismMotion>
-    public expressions: csmMap<string, ACubismMotion>
+    public motions: Map<string, ACubismMotion>
+    public expressions: Map<string, ACubismMotion>
     public expressionIds: string[]
     public motionIds: string[]
-    public textures: csmVector<WebGLTexture>
-    public eyeBlinkIds: csmVector<CubismIdHandle>
-    public lipSyncIds: csmVector<CubismIdHandle>
+    public textures: Array<WebGLTexture>
+    public eyeBlinkIds: Array<CubismIdHandle>
+    public lipSyncIds: Array<CubismIdHandle>
     public settings: ICubismModelSetting
     public vtubeSettings: VTubeStudioJson
     public displayInfo: CubismCDI3Json
@@ -293,13 +291,13 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
         if (!options) options = {}
         super()
         this.canvas = canvas
-        this.motions = new csmMap<string, ACubismMotion>()
-        this.expressions = new csmMap<string, ACubismMotion>()
+        this.motions = new Map<string, ACubismMotion>()
+        this.expressions = new Map<string, ACubismMotion>()
         this.expressionIds = []
         this.motionIds = []
-        this.textures = new csmVector<WebGLTexture>()
-        this.eyeBlinkIds = new csmVector<CubismIdHandle>()
-        this.lipSyncIds = new csmVector<CubismIdHandle>()
+        this.textures = new Array<WebGLTexture>()
+        this.eyeBlinkIds = new Array<CubismIdHandle>()
+        this.lipSyncIds = new Array<CubismIdHandle>()
         this.viewMatrix = new CubismViewMatrix()
         this.projection = new CubismMatrix44()
         this.deviceToScreen = new CubismMatrix44()
@@ -352,8 +350,8 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
         cancelAnimationFrame(id)
         this.motions.clear()
         this.expressions.clear()
-        this.eyeBlinkIds.clear()
-        this.lipSyncIds.clear()
+        this.eyeBlinkIds.length = 0
+        this.lipSyncIds.length = 0
         this.webGLRenderer.deleteTextures()
         this.webGLRenderer.deleteShader()
         this.touchController.cancelInteractions()
@@ -564,7 +562,7 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
         }
 
         this.breath = CubismBreath.create()
-        const breathParameters = new csmVector<BreathParameterData>()
+        const breathParameters = new Array<BreathParameterData>()
 
         const manager = CubismFramework?.getIdManager?.()
         const paramAngleX = manager?.getId(CubismDefaultParameterId.ParamAngleX)
@@ -572,11 +570,11 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
         const paramAngleZ = manager?.getId(CubismDefaultParameterId.ParamAngleZ)
         const paramBodyAngleX = manager?.getId(CubismDefaultParameterId.ParamBodyAngleX)
         const paramBreath = manager?.getId(CubismDefaultParameterId.ParamBreath)
-        if (paramAngleX) breathParameters.pushBack(new BreathParameterData(paramAngleX, 0.0, 15.0, 6.5345, 0.5))
-        if (paramAngleY) breathParameters.pushBack(new BreathParameterData(paramAngleY, 0.0, 8.0, 3.5345, 0.5))
-        if (paramAngleZ) breathParameters.pushBack(new BreathParameterData(paramAngleZ, 0.0, 10.0, 5.5345, 0.5))
-        if (paramBodyAngleX) breathParameters.pushBack(new BreathParameterData(paramBodyAngleX, 0.0, 4.0, 15.5345, 0.5))
-        if (paramBreath) breathParameters.pushBack(new BreathParameterData(paramBreath, 0.5, 0.5, 3.2345, 1))
+        if (paramAngleX) breathParameters.push(new BreathParameterData(paramAngleX, 0.0, 15.0, 6.5345, 0.5))
+        if (paramAngleY) breathParameters.push(new BreathParameterData(paramAngleY, 0.0, 8.0, 3.5345, 0.5))
+        if (paramAngleZ) breathParameters.push(new BreathParameterData(paramAngleZ, 0.0, 10.0, 5.5345, 0.5))
+        if (paramBodyAngleX) breathParameters.push(new BreathParameterData(paramBodyAngleX, 0.0, 4.0, 15.5345, 0.5))
+        if (paramBreath) breathParameters.push(new BreathParameterData(paramBreath, 0.5, 0.5, 3.2345, 1))
         this.breath.setParameters(breathParameters)
 
         if (userDataBuffer) {
@@ -585,26 +583,26 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
 
         const eyeBlinkCount = this.settings.getEyeBlinkParameterCount() 
         for (let i = 0; i < eyeBlinkCount; ++i) {
-            this.eyeBlinkIds.pushBack(this.settings.getEyeBlinkParameterId(i))
+            this.eyeBlinkIds.push(this.settings.getEyeBlinkParameterId(i))
         }
 
         const lipSyncCount = this.settings.getLipSyncParameterCount()
         for (let i = 0; i < lipSyncCount; ++i) {
-            this.lipSyncIds.pushBack(this.settings.getLipSyncParameterId(i))
+            this.lipSyncIds.push(this.settings.getLipSyncParameterId(i))
         }
         if (!lipSyncCount) {
             const index = this.parameters.ids.indexOf("ParamMouthOpenY")
-            if (index !== -1) this.lipSyncIds.pushBack(this.model.getParameterId(index))
-            this.lipsync = Boolean(this.lipSyncIds.getSize())
+            if (index !== -1) this.lipSyncIds.push(this.model.getParameterId(index))
+            this.lipsync = Boolean(this.lipSyncIds.length)
         }
 
-        const layout = new csmMap<string, number>()
+        const layout = new Map<string, number>()
         this.settings.getLayoutMap(layout)
         this.modelMatrix.setupFromLayout(layout)
 
         await this.motionController.load()
 
-        this.createRenderer()
+        this.createRenderer(this.canvas.width, this.canvas.height)
         await this.loadTextures()
         this.loaded = true
         this.webGLRenderer.start()
@@ -645,6 +643,8 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
         this.logicalRight = logicalWidth / 2
         this.logicalBottom = -logicalHeight / 2
         this.logicalTop = logicalHeight / 2
+
+        this.setRenderTargetSize(this.canvas.width, this.canvas.height)
 
         this.viewMatrix.setScreenRect(this.logicalLeft, this.logicalRight, this.logicalBottom, this.logicalTop)
         this.viewMatrix.scale(1, 1)
@@ -752,12 +752,12 @@ export class Live2DCubismModel extends Live2DCubismUserModel {
                 this.wavController.update(this.deltaTime)
                 let value = this.wavController.getRms()
         
-                for (let i = 0; i < this.lipSyncIds.getSize(); ++i) {
-                    const parameterIndex = this.model.getParameterIndex(this.lipSyncIds.at(i))
+                for (let i = 0; i < this.lipSyncIds.length; ++i) {
+                    const parameterIndex = this.model.getParameterIndex(this.lipSyncIds[i])
                     const minValue = this.model.getParameterMinimumValue(parameterIndex)
                     const maxValue = this.model.getParameterMaximumValue(parameterIndex)
                     const scaledValue = minValue + (maxValue - minValue) * value
-                    this.model.addParameterValueById(this.lipSyncIds.at(i), scaledValue, 0.8)
+                    this.model.addParameterValueById(this.lipSyncIds[i], scaledValue, 0.8)
                 }
             }
         

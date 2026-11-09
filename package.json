@@ -1,13 +1,13 @@
 {
   "name": "live2d-renderer",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "description": "An easy and simple to use Live2D model renderer in the browser.",
   "main": "build/live2dcubism.js",
   "types": "build/live2dcubism.d.ts",
   "scripts": {
     "start": "npm run clean && npm run rsbuild && npm run move-files && node dist/server.js",
     "rsbuild": "rsbuild build --config rsbuild.client.ts && rsbuild build --config rsbuild.server.ts",
-    "build": "del-cli ./build && tsc && del-cli ./build/core",
+    "build": "del-cli ./build && tsc && del-cli ./build/core && node scripts/build-shaders.mjs",
     "clean": "del-cli ./dist",
     "move-files": "mv ./dist/client/* ./dist/ && mv ./dist/server/* ./dist/ && rmdir ./dist/client ./dist/server",
     "predeploy": "npm run clean && npm run rsbuild && npm run move-files",

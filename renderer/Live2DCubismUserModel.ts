@@ -2,6 +2,13 @@ import {CubismUserModel} from "../framework/src/model/cubismusermodel"
 
 export class Live2DCubismUserModel extends CubismUserModel {
     public defaultPartOpacities: Float32Array
+    protected _accelerationX = 0
+    protected _accelerationY = 0
+    protected _accelerationZ = 0
+    protected _dragX = 0
+    protected _dragY = 0
+    protected _lastLipSyncValue = 0
+    protected _lipsync = true
 
     constructor() {
         super()
@@ -11,6 +18,12 @@ export class Live2DCubismUserModel extends CubismUserModel {
         this.model.initialize()
         // @ts-ignore
         this.defaultPartOpacities = structuredClone(this.parts.opacities)
+    }
+
+    public setAcceleration = (x: number, y: number, z: number) => {
+        this.accelerationX = x
+        this.accelerationY = y
+        this.accelerationZ = z
     }
 
     get accelerationX() {

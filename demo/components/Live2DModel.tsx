@@ -33,7 +33,7 @@ const Live2DModel: React.FunctionComponent = (props) => {
     }, [])
 
     const load = async () => {
-        let cubismCorePath = "https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"
+        let cubismCorePath = "https://cubism.live2d.com/sdk-web/core/06/live2dcubismcore.min.js"
         const live2DModel = new Live2DCubismModel(rendererRef.current!, {cubismCorePath, scale: 1, scaledYPos: false})
         live2DModel.canvas.width = 700
         live2DModel.canvas.height = 700

@@ -1,5 +1,7 @@
 
 import {Live2DCubismModel} from "./Live2DCubismModel"
+import {CubismShaderManager_WebGL, CubismShaderSet} from "../framework/src/rendering/cubismshader_webgl"
+import shaders from "./shaders"
 
 export class WebGLRenderer {
     public model: Live2DCubismModel
@@ -55,6 +57,14 @@ export class WebGLRenderer {
     public start = () => {
         const gl = this.model.canvas.getContext("webgl2")
         this.model.getRenderer().startUp(gl)
+        const shader = CubismShaderManager_WebGL.getInstance().getShader(gl)
+        if (!shader._isShaderLoaded) {
+            Object.assign(shader, shaders)
+            shader._shaderSets = Array.from({length: shader._shaderCount}, () => new CubismShaderSet())
+            shader.registerShader()
+            shader.registerBlendShader()
+            shader._isShaderLoaded = true
+        }
     }
 
     public loadTexture = (index: number, image: HTMLImageElement) => {
@@ -95,20 +105,20 @@ export class WebGLRenderer {
 
     public deleteTextures = () => {
         const gl = this.model.canvas.getContext("webgl2")
-        for (let i = 0; i < this.model.textures.getSize(); i++) {
-            gl.deleteTexture(this.model.textures.at(i))
-            this.model.textures.set(i, null)
+        for (let i = 0; i < this.model.textures.length; i++) {
+            gl.deleteTexture(this.model.textures[i])
+            this.model.textures[i] = null
         }
-        this.model.textures.clear()
+        this.model.textures.length = 0
     }
 
     public deleteTexture = (texture: WebGLTexture) => {
         const gl = this.model.canvas.getContext("webgl2")
-        for (let i = 0; i < this.model.textures.getSize(); i++) {
-            if (this.model.textures.at(i) === texture) {
-                gl.deleteTexture(this.model.textures.at(i))
-                this.model.textures.set(i, null)
-                this.model.textures.remove(i)
+        for (let i = 0; i < this.model.textures.length; i++) {
+            if (this.model.textures[i] === texture) {
+                gl.deleteTexture(this.model.textures[i])
+                this.model.textures[i] = null
+                this.model.textures.splice(i, 1)
                 break
             }
         }

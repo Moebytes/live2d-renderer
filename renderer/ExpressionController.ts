@@ -16,11 +16,11 @@ export class ExpressionController {
             const expressionBuffer = expressionBuffers[i]
             const motion = this.model.loadExpression(expressionBuffer, expressionBuffer.byteLength, name)
 
-            if (this.model.expressions.getValue(name) !== null) {
-                ACubismMotion.delete(this.model.expressions.getValue(name))
-                this.model.expressions.setValue(name, null)
+            if (this.model.expressions.has(name)) {
+                ACubismMotion.delete(this.model.expressions.get(name))
+                this.model.expressions.set(name, null)
             }
-            this.model.expressions.setValue(name, motion)
+            this.model.expressions.set(name, motion)
         }
     }
 
@@ -31,14 +31,14 @@ export class ExpressionController {
     }
 
     public setExpression = (expression: string) => {
-        const motion = this.model.expressions.getValue(expression)
-        if (motion !== null) this.model.expressionManager.startMotion(motion, false)
+        const motion = this.model.expressions.get(expression)
+        if (motion) this.model.expressionManager.startMotion(motion, false)
     }
 
     public setRandomExpression = () => {
-        if (!this.model.expressions.getSize()) return
-        const rand = Math.floor(Math.random() * this.model.expressions.getSize())
-        const name = this.model.expressions._keyValues[rand].first
+        if (!this.model.expressions.size) return
+        const rand = Math.floor(Math.random() * this.model.expressions.size)
+        const name = Array.from(this.model.expressions.keys())[rand]
         this.setExpression(name)
     }
 }
